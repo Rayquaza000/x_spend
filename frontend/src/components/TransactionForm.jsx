@@ -20,7 +20,7 @@ export default function TransactionForm({ type, onSuccess }) {
     category: '',
     description: '',
     mode: 'cash',
-    date: new Date().toISOString().slice(0, 16),
+    date: new Date(Date.now() + 5.5 * 60 * 60 * 1000).toISOString().slice(0, 16),
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -40,7 +40,7 @@ export default function TransactionForm({ type, onSuccess }) {
     setLoading(true);
     try {
       await axios.post('/api/transactions', { ...form, type });
-      setForm({ amount: '', category: '', description: '', mode: 'cash', date: new Date().toISOString().slice(0, 16) });
+      setForm({ amount: '', category: '', description: '', mode: 'cash', date: new Date(Date.now() + 5.5 * 60 * 60 * 1000).toISOString().slice(0, 16) });
       onSuccess && onSuccess();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to add transaction');
