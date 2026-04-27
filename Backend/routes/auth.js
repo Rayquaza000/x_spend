@@ -121,4 +121,23 @@ router.delete('/account', protect, async (req, res) => {
   }
 });
 
+// GET /api/auth/modes
+router.get('/modes', protect, async (req, res) => {
+  const user = await User.findById(req.user._id);
+  res.json(user.customModes || []);
+});
+
+// POST /api/auth/modes
+router.post('/modes', protect, async (req, res) => {
+  const { mode } = req.body;
+  if (!mode || !mode.trim()) return res.status(400).json({ message: 'Mode is required' });
+  const user = await User.findById(req.user._id);
+  const trimmed = mode.trim().toLowerCase();
+  if (!user.customModes.includes(trimmed)) {
+    user.customModes.push(trimmed);
+    await user.save();
+  }
+  res.json(user.customModes);
+});
+
 module.exports = router;

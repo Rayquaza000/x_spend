@@ -28,8 +28,8 @@ const transactionSchema = new mongoose.Schema({
   },
   mode: {
     type: String,
-    enum: ['cash', 'card', 'upi', 'bank_transfer', 'other'],
-    default: 'cash'
+    default: 'cash',
+    trim: true
   },
   date: {
     type: Date,
