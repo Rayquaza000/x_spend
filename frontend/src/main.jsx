@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import axios from 'axios'
-axios.defaults.baseURL = import.meta.env.DEV ? '' : 'https://x-spend-j0cu.onrender.com'
+axios.defaults.baseURL = import.meta.env.DEV ? '' : 'https://x-spend.onrender.com'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />
