@@ -35,21 +35,25 @@ export default function Visual() {
   if (!summary) return null;
 
   const pieData = [
-    { name: 'Income', value: summary.income },
-    { name: 'Expense', value: summary.expense },
+    { name: 'Income', value: summary.income || 0 },
+    { name: 'Expense', value: summary.expense || 0 },
   ];
 
-  const catData = summary.categoryBreakdown
-    .map(c => ({ name: c.category, income: c.income || 0, expense: c.expense || 0 }))
-    .sort((a, b) => (b.income + b.expense) - (a.income + a.expense))
-    .slice(0, 8);
+  const catData = Array.isArray(summary.categoryBreakdown)
+    ? summary.categoryBreakdown
+        .map(c => ({ name: c.category, income: c.income || 0, expense: c.expense || 0 }))
+        .sort((a, b) => (b.income + b.expense) - (a.income + a.expense))
+        .slice(0, 8)
+    : [];
 
-  const monthData = summary.monthlyBreakdown.map(m => ({
-    name: m.month,
-    income: m.income,
-    expense: m.expense,
-    balance: m.income - m.expense,
-  }));
+  const monthData = Array.isArray(summary.monthlyBreakdown)
+    ? summary.monthlyBreakdown.map(m => ({
+        name: m.month,
+        income: m.income,
+        expense: m.expense,
+        balance: m.income - m.expense,
+      }))
+    : [];
 
   return (
     <div className="page-container">
@@ -110,7 +114,7 @@ export default function Visual() {
         {/* Modes of Payment Breakdown Bar Chart */}
         <div className="card">
           <div className="card-title">Modes of Payment Breakdown</div>
-          {!summary.modeBreakdown || summary.modeBreakdown.length === 0 ? (
+          {!Array.isArray(summary.modeBreakdown) || summary.modeBreakdown.length === 0 ? (
             <div className="empty-state">No payment mode data available</div>
           ) : (
             <ResponsiveContainer width="100%" height={240}>
@@ -135,7 +139,7 @@ export default function Visual() {
         {/* Payment Modes Balance Table */}
         <div className="card">
           <div className="card-title">Payment Modes Balance</div>
-          {!summary.modeBreakdown || summary.modeBreakdown.length === 0 ? (
+          {!Array.isArray(summary.modeBreakdown) || summary.modeBreakdown.length === 0 ? (
             <div className="empty-state">No payment mode data available</div>
           ) : (
             <div className="table-wrap" style={{ border: 'none', boxShadow: 'none', background: 'transparent' }}>

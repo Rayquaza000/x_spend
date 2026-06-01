@@ -29,6 +29,16 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'X_Spend API running' });
 });
 
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  const path = require('path');
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../frontend', 'dist', 'index.html'));
+  });
+}
+
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;
 

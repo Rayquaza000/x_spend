@@ -157,7 +157,7 @@ export default function Dashboard() {
             <div className="card-title">Balance by Payment Mode</div>
             {loadingSummary ? (
               <div className="loading">Loading…</div>
-            ) : !summary.modeBreakdown || summary.modeBreakdown.length === 0 ? (
+            ) : !Array.isArray(summary.modeBreakdown) || summary.modeBreakdown.length === 0 ? (
               <div className="empty-state">No transactions in this period</div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
