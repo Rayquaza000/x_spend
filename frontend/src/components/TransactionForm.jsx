@@ -61,7 +61,7 @@ function ModeSelector({ value, onChange }) {
       <button
         type="button"
         className="txn-form-input"
-        style={{ width: '100%', textAlign: 'left', cursor: 'pointer', textTransform: 'capitalize', background: '#fff' }}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', textAlign: 'left', cursor: 'pointer', textTransform: 'capitalize', background: '#fff' }}
         onClick={() => setOpen(o => !o)}
       >
         {value.replace('_', ' ')} ▾

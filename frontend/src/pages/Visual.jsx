@@ -107,6 +107,78 @@ export default function Visual() {
           )}
         </div>
 
+        {/* Modes of Payment Breakdown Bar Chart */}
+        <div className="card">
+          <div className="card-title">Modes of Payment Breakdown</div>
+          {!summary.modeBreakdown || summary.modeBreakdown.length === 0 ? (
+            <div className="empty-state">No payment mode data available</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={summary.modeBreakdown.map(m => ({
+                name: m.mode.replace('_', ' '),
+                income: m.income,
+                expense: m.expense,
+                balance: m.balance
+              })).sort((a, b) => (b.income + b.expense) - (a.income + a.expense))} margin={{ top: 5, right: 10, left: 10, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} style={{ textTransform: 'capitalize' }} />
+                <YAxis tickFormatter={v => '₹' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v)} tick={{ fontSize: 11 }} />
+                <Tooltip formatter={(v) => fmt(v)} />
+                <Legend wrapperStyle={{ paddingTop: 8 }} />
+                <Bar dataKey="income" fill="#4A7C1A" name="Income" radius={[3,3,0,0]} />
+                <Bar dataKey="expense" fill="#8B1C1C" name="Expense" radius={[3,3,0,0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
+        {/* Payment Modes Balance Table */}
+        <div className="card">
+          <div className="card-title">Payment Modes Balance</div>
+          {!summary.modeBreakdown || summary.modeBreakdown.length === 0 ? (
+            <div className="empty-state">No payment mode data available</div>
+          ) : (
+            <div className="table-wrap" style={{ border: 'none', boxShadow: 'none', background: 'transparent' }}>
+              <table className="txn-table" style={{ minWidth: 'auto', width: '100%', fontSize: '0.82rem' }}>
+                <thead>
+                  <tr style={{ background: 'transparent' }}>
+                    <th style={{ padding: '8px 10px', background: 'transparent' }}>Mode</th>
+                    <th style={{ padding: '8px 10px', background: 'transparent', textAlign: 'right' }}>Income</th>
+                    <th style={{ padding: '8px 10px', background: 'transparent', textAlign: 'right' }}>Expense</th>
+                    <th style={{ padding: '8px 10px', background: 'transparent', textAlign: 'right' }}>Net Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {summary.modeBreakdown
+                    .slice()
+                    .sort((a, b) => b.income + b.expense - (a.income + a.expense))
+                    .map(item => (
+                      <tr key={item.mode}>
+                        <td style={{ padding: '8px 10px', textTransform: 'capitalize', fontWeight: 600 }}>
+                          {item.mode.replace('_', ' ')}
+                        </td>
+                        <td style={{ padding: '8px 10px', textAlign: 'right', color: 'var(--income-color)', fontWeight: 600 }}>
+                          {fmt(item.income).replace('₹', '')}
+                        </td>
+                        <td style={{ padding: '8px 10px', textAlign: 'right', color: 'var(--expense-color)', fontWeight: 600 }}>
+                          {fmt(item.expense).replace('₹', '')}
+                        </td>
+                        <td style={{
+                          padding: '8px 10px',
+                          textAlign: 'right',
+                          fontWeight: 700,
+                          color: item.balance >= 0 ? 'var(--income-color)' : 'var(--expense-color)'
+                        }}>
+                          {item.balance < 0 ? '-' : ''}{fmt(Math.abs(item.balance)).replace('₹', '')}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
         {/* Monthly Trend Line */}
         <div className="card" style={{ gridColumn: monthData.length > 0 ? '1 / -1' : 'auto' }}>
           <div className="card-title">Monthly Trend</div>

@@ -20,18 +20,42 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const { data } = await axios.post('/api/auth/login', { email, password });
     localStorage.setItem('x_spend_token', data.token);
-    localStorage.setItem('x_spend_user', JSON.stringify({ _id: data._id, username: data.username, email: data.email }));
+    localStorage.setItem('x_spend_user', JSON.stringify({
+      _id: data._id,
+      username: data.username,
+      email: data.email,
+      dashboardStartDate: data.dashboardStartDate,
+      dashboardEndDate: data.dashboardEndDate
+    }));
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-    setUser({ _id: data._id, username: data.username, email: data.email });
+    setUser({
+      _id: data._id,
+      username: data.username,
+      email: data.email,
+      dashboardStartDate: data.dashboardStartDate,
+      dashboardEndDate: data.dashboardEndDate
+    });
     return data;
   };
 
   const register = async (username, email, password) => {
     const { data } = await axios.post('/api/auth/register', { username, email, password });
     localStorage.setItem('x_spend_token', data.token);
-    localStorage.setItem('x_spend_user', JSON.stringify({ _id: data._id, username: data.username, email: data.email }));
+    localStorage.setItem('x_spend_user', JSON.stringify({
+      _id: data._id,
+      username: data.username,
+      email: data.email,
+      dashboardStartDate: data.dashboardStartDate,
+      dashboardEndDate: data.dashboardEndDate
+    }));
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-    setUser({ _id: data._id, username: data.username, email: data.email });
+    setUser({
+      _id: data._id,
+      username: data.username,
+      email: data.email,
+      dashboardStartDate: data.dashboardStartDate,
+      dashboardEndDate: data.dashboardEndDate
+    });
     return data;
   };
 

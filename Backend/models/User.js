@@ -25,6 +25,22 @@ const userSchema = new mongoose.Schema({
   customModes: {
     type: [String],
     default: []
+  },
+  resetPasswordCode: {
+    type: String,
+    default: undefined
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: undefined
+  },
+  dashboardStartDate: {
+    type: String,
+    default: undefined
+  },
+  dashboardEndDate: {
+    type: String,
+    default: undefined
   }
 }, { timestamps: true });
 

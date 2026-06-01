@@ -28,6 +28,8 @@ router.post('/register', async (req, res) => {
       _id: user._id,
       username: user.username,
       email: user.email,
+      dashboardStartDate: user.dashboardStartDate,
+      dashboardEndDate: user.dashboardEndDate,
       token: generateToken(user._id)
     });
   } catch (error) {
@@ -53,6 +55,8 @@ router.post('/login', async (req, res) => {
       _id: user._id,
       username: user.username,
       email: user.email,
+      dashboardStartDate: user.dashboardStartDate,
+      dashboardEndDate: user.dashboardEndDate,
       token: generateToken(user._id)
     });
   } catch (error) {
@@ -65,7 +69,9 @@ router.get('/me', protect, async (req, res) => {
   res.json({
     _id: req.user._id,
     username: req.user.username,
-    email: req.user.email
+    email: req.user.email,
+    dashboardStartDate: req.user.dashboardStartDate,
+    dashboardEndDate: req.user.dashboardEndDate
   });
 });
 
@@ -79,11 +85,39 @@ router.put('/profile', protect, async (req, res) => {
     if (email) user.email = email;
 
     await user.save();
-    res.json({ _id: user._id, username: user.username, email: user.email });
+    res.json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      dashboardStartDate: user.dashboardStartDate,
+      dashboardEndDate: user.dashboardEndDate
+    });
   } catch (error) {
     if (error.code === 11000) {
       return res.status(400).json({ message: 'Username or email already taken' });
     }
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// PUT /api/auth/dashboard-dates — update dashboard start and end dates
+router.put('/dashboard-dates', protect, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (startDate) user.dashboardStartDate = startDate;
+    if (endDate) user.dashboardEndDate = endDate;
+
+    await user.save();
+    res.json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      dashboardStartDate: user.dashboardStartDate,
+      dashboardEndDate: user.dashboardEndDate
+    });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
@@ -138,6 +172,69 @@ router.post('/modes', protect, async (req, res) => {
     await user.save();
   }
   res.json(user.customModes);
+});
+
+// POST /api/auth/forgot-password
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    if (!user) {
+      return res.status(404).json({ message: 'No user registered with this email address' });
+    }
+
+    // Generate 6-digit OTP code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetPasswordCode = code;
+    user.resetPasswordExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    await user.save();
+
+    // Log the OTP code prominently in console for local testing
+    console.log('\n==========================================');
+    console.log(`[SECURITY] PASSWORD RESET CODE FOR: ${email}`);
+    console.log(`CODE: ${code} (Expires in 10 minutes)`);
+    console.log('==========================================\n');
+
+    res.json({ message: 'Reset code printed to server console for testing' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// POST /api/auth/reset-password
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { email, code, newPassword } = req.body;
+    if (!email || !code || !newPassword) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+    }
+
+    const user = await User.findOne({
+      email: email.trim().toLowerCase(),
+      resetPasswordCode: code.trim(),
+      resetPasswordExpires: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired verification code' });
+    }
+
+    // Update password
+    user.password = newPassword;
+    user.resetPasswordCode = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ message: 'Password reset successful. You can now login.' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 module.exports = router;

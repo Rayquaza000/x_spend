@@ -40,6 +40,14 @@ router.get('/', protect, async (req, res) => {
       monthlyMap[key][t.type] += t.amount;
     });
 
+    // Mode breakdown
+    const modeMap = {};
+    transactions.forEach(t => {
+      const mode = t.mode && t.mode.trim() ? t.mode.trim().toLowerCase() : 'cash';
+      if (!modeMap[mode]) modeMap[mode] = { income: 0, expense: 0 };
+      modeMap[mode][t.type] += t.amount;
+    });
+
     res.json({
       income,
       expense,
@@ -48,7 +56,13 @@ router.get('/', protect, async (req, res) => {
         category: cat,
         ...vals
       })),
-      monthlyBreakdown: Object.values(monthlyMap).sort((a, b) => a.month.localeCompare(b.month))
+      monthlyBreakdown: Object.values(monthlyMap).sort((a, b) => a.month.localeCompare(b.month)),
+      modeBreakdown: Object.entries(modeMap).map(([mode, vals]) => ({
+        mode,
+        income: vals.income,
+        expense: vals.expense,
+        balance: vals.income - vals.expense
+      }))
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
