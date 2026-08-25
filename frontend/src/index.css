@@ -159,10 +159,9 @@ body {
 
 /* ── Transaction Form ── */
 .txn-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .txn-form-input {
@@ -182,20 +181,16 @@ body {
 .txn-form-input::placeholder { color: var(--text-light); }
 
 .txn-form-note {
-  grid-row: 1 / 4;
-  grid-column: 2 / 3;
   resize: none;
-  height: 130px;
+  height: 64px;
   font-family: inherit;
 }
 
 .txn-form-date {
-  grid-column: 1 / -1;
   color: var(--text-mid);
 }
 
 .txn-form-footer {
-  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -567,7 +562,6 @@ body {
   .navbar-link { padding: 4px 8px; font-size: 0.8rem; }
   .navbar-links { padding: 4px 7px; }
   .page-container { padding: 0 14px 20px; }
-  .txn-form { grid-template-columns: 1fr 1fr; }
   .dashboard-grid { gap: 14px; }
 }
 

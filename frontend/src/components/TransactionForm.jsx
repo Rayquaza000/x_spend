@@ -281,12 +281,6 @@ export default function TransactionForm({ type, onSuccess }) {
           value={form.amount}
           onChange={set('amount')}
         />
-        <textarea
-          className="txn-form-input txn-form-note"
-          placeholder="Note"
-          value={form.description}
-          onChange={set('description')}
-        />
         <CategorySelector
           type={type}
           value={form.category}
@@ -295,6 +289,12 @@ export default function TransactionForm({ type, onSuccess }) {
         <ModeSelector
           value={form.mode}
           onChange={mode => setForm(f => ({ ...f, mode }))}
+        />
+        <textarea
+          className="txn-form-input txn-form-note"
+          placeholder="Note"
+          value={form.description}
+          onChange={set('description')}
         />
         <input
           className="txn-form-input txn-form-date"
