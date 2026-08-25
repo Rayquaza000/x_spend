@@ -167,11 +167,41 @@ router.post('/modes', protect, async (req, res) => {
   if (!mode || !mode.trim()) return res.status(400).json({ message: 'Mode is required' });
   const user = await User.findById(req.user._id);
   const trimmed = mode.trim().toLowerCase();
+  if (!user.customModes) user.customModes = [];
   if (!user.customModes.includes(trimmed)) {
     user.customModes.push(trimmed);
     await user.save();
   }
   res.json(user.customModes);
+});
+
+// GET /api/auth/categories
+router.get('/categories', protect, async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const customCategories = user.customCategories || { expense: [], income: [] };
+  res.json(customCategories);
+});
+
+// POST /api/auth/categories
+router.post('/categories', protect, async (req, res) => {
+  const { category, type } = req.body;
+  if (!category || !category.trim()) return res.status(400).json({ message: 'Category is required' });
+  const user = await User.findById(req.user._id);
+  if (!user.customCategories) {
+    user.customCategories = { expense: [], income: [] };
+  }
+  const catType = type === 'income' ? 'income' : 'expense';
+  if (!user.customCategories[catType]) {
+    user.customCategories[catType] = [];
+  }
+  const trimmed = category.trim();
+  const formatted = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+  if (!user.customCategories[catType].some(c => c.toLowerCase() === formatted.toLowerCase())) {
+    user.customCategories[catType].push(formatted);
+    user.markModified('customCategories');
+    await user.save();
+  }
+  res.json(user.customCategories);
 });
 
 // POST /api/auth/forgot-password

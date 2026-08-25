@@ -26,6 +26,16 @@ const userSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+  customCategories: {
+    expense: {
+      type: [String],
+      default: []
+    },
+    income: {
+      type: [String],
+      default: []
+    }
+  },
   resetPasswordCode: {
     type: String,
     default: undefined
