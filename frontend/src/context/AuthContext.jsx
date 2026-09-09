@@ -7,14 +7,58 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const logout = () => {
+    localStorage.removeItem('x_spend_token');
+    localStorage.removeItem('x_spend_user');
+    delete axios.defaults.headers.common['Authorization'];
+    setUser(null);
+  };
+
   useEffect(() => {
-    const token = localStorage.getItem('x_spend_token');
-    const savedUser = localStorage.getItem('x_spend_user');
-    if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
-    setLoading(false);
+    const initAuth = async () => {
+      const token = localStorage.getItem('x_spend_token');
+      const savedUser = localStorage.getItem('x_spend_user');
+      if (token && savedUser) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        try {
+          const { data } = await axios.get('/api/auth/me');
+          setUser(data);
+          localStorage.setItem('x_spend_user', JSON.stringify(data));
+        } catch (err) {
+          if (err.response && err.response.status === 401) {
+            logout();
+          } else {
+            setUser(JSON.parse(savedUser));
+          }
+        }
+      }
+      setLoading(false);
+    };
+
+    initAuth();
+  }, []);
+
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (
+          error.response &&
+          error.response.status === 401 &&
+          !error.config?.url?.includes('/api/auth/login') &&
+          !error.config?.url?.includes('/api/auth/register') &&
+          !error.config?.url?.includes('/api/auth/forgot-password') &&
+          !error.config?.url?.includes('/api/auth/reset-password')
+        ) {
+          logout();
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
   }, []);
 
   const login = async (email, password) => {
@@ -59,12 +103,6 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const logout = () => {
-    localStorage.removeItem('x_spend_token');
-    localStorage.removeItem('x_spend_user');
-    delete axios.defaults.headers.common['Authorization'];
-    setUser(null);
-  };
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout, loading }}>
