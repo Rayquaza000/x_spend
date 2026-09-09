@@ -35,11 +35,11 @@ export default function Details() {
       if (endDate)    params.set('endDate', endDate);
 
       const { data } = await axios.get(`/api/transactions?${params}`);
-      setTransactions(data.transactions);
-      setTotal(data.total);
-      setPages(data.pages);
+      setTransactions(Array.isArray(data?.transactions) ? data.transactions : []);
+      setTotal(typeof data?.total === 'number' ? data.total : 0);
+      setPages(typeof data?.pages === 'number' ? data.pages : 1);
     } catch {
-      /* ignore */
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
@@ -122,7 +122,7 @@ export default function Details() {
       <div className="table-wrap">
         {loading ? (
           <div className="loading">Loading transactions…</div>
-        ) : transactions.length === 0 ? (
+        ) : !Array.isArray(transactions) || transactions.length === 0 ? (
           <div className="empty-state">
             {search || typeFilter || startDate || endDate
               ? 'No transactions match your search'

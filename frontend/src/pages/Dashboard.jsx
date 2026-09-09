@@ -65,7 +65,9 @@ export default function Dashboard() {
     setLoadingSummary(true);
     try {
       const { data } = await axios.get(`/api/summary?startDate=${dates.start}&endDate=${dates.end}`);
-      setSummary(data);
+      if (data && typeof data === 'object' && !data.message) {
+        setSummary(data);
+      }
     } catch {
       /* ignore */
     } finally {
@@ -77,8 +79,10 @@ export default function Dashboard() {
     if (!user) return;
     try {
       const { data } = await axios.get('/api/transactions/recent');
-      setRecent(data);
-    } catch { /* ignore */ }
+      setRecent(Array.isArray(data) ? data : []);
+    } catch {
+      setRecent([]);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -198,7 +202,7 @@ export default function Dashboard() {
           {/* Recent Activity Card */}
           <div className="card">
             <div className="card-title">Recent Activity</div>
-            {recent.length === 0 ? (
+            {!Array.isArray(recent) || recent.length === 0 ? (
               <div className="empty-state">No recent transactions</div>
             ) : (
               <div className="recent-activity-list">

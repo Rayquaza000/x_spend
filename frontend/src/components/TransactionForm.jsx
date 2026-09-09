@@ -24,7 +24,7 @@ function CategorySelector({ type, value, onChange }) {
   useEffect(() => {
     axios.get('/api/auth/categories')
       .then(({ data }) => {
-        const customForType = (data && data[type]) ? data[type] : [];
+        const customForType = (data && Array.isArray(data[type])) ? data[type] : [];
         const merged = [...defaultCats, ...customForType.filter(c => !defaultCats.some(d => d.toLowerCase() === c.toLowerCase()))];
         setCategories(merged);
       })
@@ -50,7 +50,7 @@ function CategorySelector({ type, value, onChange }) {
     setAdding(true);
     try {
       const { data } = await axios.post('/api/auth/categories', { category: formatted, type });
-      const customForType = (data && data[type]) ? data[type] : [];
+      const customForType = (data && Array.isArray(data[type])) ? data[type] : [];
       const merged = [...defaultCats, ...customForType.filter(c => !defaultCats.some(d => d.toLowerCase() === c.toLowerCase()))];
       setCategories(merged);
       onChange(formatted);
@@ -141,7 +141,8 @@ function ModeSelector({ value, onChange }) {
   useEffect(() => {
     axios.get('/api/auth/modes')
       .then(({ data }) => {
-        const merged = [...DEFAULT_MODES, ...data.filter(m => !DEFAULT_MODES.includes(m))];
+        const customModes = Array.isArray(data) ? data : [];
+        const merged = [...DEFAULT_MODES, ...customModes.filter(m => !DEFAULT_MODES.includes(m))];
         setModes(merged);
       })
       .catch(() => {});
@@ -165,7 +166,8 @@ function ModeSelector({ value, onChange }) {
     setAdding(true);
     try {
       const { data } = await axios.post('/api/auth/modes', { mode: trimmed });
-      const merged = [...DEFAULT_MODES, ...data.filter(m => !DEFAULT_MODES.includes(m))];
+      const customModes = Array.isArray(data) ? data : [];
+      const merged = [...DEFAULT_MODES, ...customModes.filter(m => !DEFAULT_MODES.includes(m))];
       setModes(merged);
       onChange(trimmed);
       setCustomInput('');

@@ -32,9 +32,12 @@ export default function RecentActivity() {
       const params = new URLSearchParams({ limit: 30 });
       if (search) params.set('search', search);
       const { data } = await axios.get(`/api/transactions?${params}`);
-      setTransactions(data.transactions);
-    } catch { /* ignore */ }
-    finally { setLoading(false); }
+      setTransactions(Array.isArray(data?.transactions) ? data.transactions : []);
+    } catch {
+      setTransactions([]);
+    } finally {
+      setLoading(false);
+    }
   }, [user, search]);
 
   useEffect(() => {
@@ -58,13 +61,13 @@ export default function RecentActivity() {
           )}
         </div>
         <span style={{ marginLeft: 'auto', fontSize: '0.85rem', color: '#777' }}>
-          {transactions.length} transaction{transactions.length !== 1 ? 's' : ''}
+          {(Array.isArray(transactions) ? transactions.length : 0)} transaction{(Array.isArray(transactions) ? transactions.length : 0) !== 1 ? 's' : ''}
         </span>
       </div>
 
       {loading ? (
         <div className="loading">Loading activity…</div>
-      ) : transactions.length === 0 ? (
+      ) : !Array.isArray(transactions) || transactions.length === 0 ? (
         <div className="empty-state">
           {search ? 'No transactions match your search' : 'No transactions yet'}
         </div>
