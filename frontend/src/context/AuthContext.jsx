@@ -22,8 +22,12 @@ export const AuthProvider = ({ children }) => {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         try {
           const { data } = await axios.get('/api/auth/me');
-          setUser(data);
-          localStorage.setItem('x_spend_user', JSON.stringify(data));
+          if (data && data._id) {
+            setUser(data);
+            localStorage.setItem('x_spend_user', JSON.stringify(data));
+          } else {
+            logout();
+          }
         } catch (err) {
           if (err.response && err.response.status === 401) {
             logout();

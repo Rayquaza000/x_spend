@@ -9,7 +9,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173','https://x-spend-j0cu.onrender.com'],
+  origin: true,
   credentials: true
 }));
 app.use(express.json());
