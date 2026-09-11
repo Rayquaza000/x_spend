@@ -381,8 +381,8 @@ body {
   font-size: 0.95rem;
 }
 
-/* ── Delete button ── */
-.del-btn {
+/* ── Action buttons ── */
+.del-btn, .edit-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -393,6 +393,7 @@ body {
   transition: color 0.15s;
 }
 .del-btn:hover { color: var(--expense-color); }
+.edit-btn:hover { color: var(--text-dark); }
 
 /* ── Visual / Charts ── */
 .charts-grid {

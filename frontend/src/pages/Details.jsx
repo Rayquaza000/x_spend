@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import EditTransactionModal from '../components/EditTransactionModal';
 
 const fmt = (n) => new Intl.NumberFormat('en-IN').format(n || 0);
 
@@ -23,6 +24,7 @@ export default function Details() {
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [deleting, setDeleting] = useState(null);
+  const [editingTxn, setEditingTxn] = useState(null);
 
   const fetchTransactions = useCallback(async () => {
     if (!user) return;
@@ -157,14 +159,23 @@ export default function Details() {
                   <td style={{ textTransform: 'capitalize' }}>{t.mode?.replace('_', ' ')}</td>
                   <td style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>₹{fmt(t.balance)}</td>
                   <td>
-                    <button
-                      className="del-btn"
-                      onClick={() => handleDelete(t._id)}
-                      disabled={deleting === t._id}
-                      title="Delete"
-                    >
-                      🗑
-                    </button>
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                      <button
+                        className="edit-btn"
+                        onClick={() => setEditingTxn(t)}
+                        title="Edit"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="del-btn"
+                        onClick={() => handleDelete(t._id)}
+                        disabled={deleting === t._id}
+                        title="Delete"
+                      >
+                        🗑
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -192,6 +203,18 @@ export default function Details() {
             style={{ cursor: 'pointer' }}
           >Next →</button>
         </div>
+      )}
+
+      {/* Edit Transaction Modal */}
+      {editingTxn && (
+        <EditTransactionModal
+          transaction={editingTxn}
+          onClose={() => setEditingTxn(null)}
+          onSuccess={() => {
+            setEditingTxn(null);
+            fetchTransactions();
+          }}
+        />
       )}
     </div>
   );

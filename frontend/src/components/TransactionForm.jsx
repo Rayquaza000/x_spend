@@ -13,7 +13,7 @@ const getNowIST = () => {
   return istDate.toISOString().slice(0, 16);
 };
 
-function CategorySelector({ type, value, onChange }) {
+export function CategorySelector({ type, value, onChange }) {
   const defaultCats = CATEGORIES[type] || [];
   const [categories, setCategories] = useState(defaultCats);
   const [open, setOpen] = useState(false);
@@ -131,7 +131,7 @@ function CategorySelector({ type, value, onChange }) {
   );
 }
 
-function ModeSelector({ value, onChange }) {
+export function ModeSelector({ value, onChange }) {
   const [modes, setModes] = useState(DEFAULT_MODES);
   const [open, setOpen] = useState(false);
   const [customInput, setCustomInput] = useState('');
